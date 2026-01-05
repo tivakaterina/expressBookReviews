@@ -1,0 +1,20 @@
+cURL command: curl -X POST http://localhost:5000/register -H "Content-Type: application/json" -d '{"username":"testuser","password":"testpass"}'
+
+Output:
+{"message":"User successfully registered. Now you can login"}
+
+---
+
+Testing duplicate username:
+cURL command: curl -X POST http://localhost:5000/register -H "Content-Type: application/json" -d '{"username":"testuser","password":"testpass2"}'
+
+Output:
+{"message":"Username already exists"}
+
+---
+
+Testing missing password:
+cURL command: curl -X POST http://localhost:5000/register -H "Content-Type: application/json" -d '{"username":"newuser"}'
+
+Output:
+{"message":"Username and password are required"}

@@ -1,0 +1,12 @@
+cURL command: curl -X PUT "http://localhost:5000/customer/auth/review/1?review=Great%20book!" -H "Content-Type: application/json" -b cookies.txt
+
+Output:
+{"message":"Review added successfully"}
+
+---
+
+Testing review modification (same user modifies existing review on same ISBN):
+cURL command: curl -X PUT "http://localhost:5000/customer/auth/review/1?review=Excellent%20book!" -H "Content-Type: application/json" -b cookies.txt
+
+Output:
+{"message":"Review modified successfully"}
