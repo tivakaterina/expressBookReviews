@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require('axios'); 
 let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
@@ -22,14 +23,37 @@ public_users.post("/register", (req,res) => {
 });
 
 // Get the book list available in the shop
-public_users.get('/',function (req, res) {
-  return res.status(200).type(json).send(JSON.stringify(books));
+public_users.get('/',async function (req, res) {
+    const getBooks = () => {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            resolve(books);
+          }, 0);
+        });
+      };
+
+      const booksList = await getBooks();
+  return res.status(200).type(json).send(JSON.stringify(booksList));
 });
 
 // Get book details based on ISBN
-public_users.get('/isbn/:isbn',function (req, res) {
+public_users.get('/isbn/:isbn', async function (req, res) {
     const isbn = req.params.isbn;
-    const book = books[isbn];
+
+    const getBookByISBN = (isbn) => {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            if (books[isbn]) {
+              resolve(books[isbn]);
+            } else {
+              reject(new Error("Book not found"));
+            }
+          }, 0);
+        });
+      };
+
+    const book = await getBookByISBN(isbn);  
+    
     if (book) {
       res.status(200).json(book);
     } else {
@@ -38,17 +62,31 @@ public_users.get('/isbn/:isbn',function (req, res) {
  });
   
 
-public_users.get('/author/:author',function (req, res) {
+public_users.get('/author/:author',async function (req, res) {
   const author = req.params.author;
-  const matchedBooks = {}
+  const getBooksByAuthor = (author) => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const matchingBooks = {};
+        const bookKeys = Object.keys(books);
+        
+        for (let key of bookKeys) {
+          if (books[key].author === author) {
+            matchingBooks[key] = books[key];
+          }
+        }
+        
+        if (Object.keys(matchingBooks).length > 0) {
+          resolve(matchingBooks);
+        } else {
+          reject(new Error("No books found for this author"));
+        }
+      }, 0);
+    });
+  };
 
-  const bookKeys = Object.keys(books)
 
-  for (let book of bookKeys) {
-    if(books[key].author === author) {
-        matchedBooks[key] = books[key]
-    }
-  }
+  const matchedBooks = await getBooksByAuthor(author);
 
   if(Object.keys(matchedBooks).length === 0) {
     res.status(404).json({message: "No books found for this author"})
